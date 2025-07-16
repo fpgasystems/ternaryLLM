@@ -1,0 +1,48 @@
+.vscode/
+.vs/
+x64/
+*.ipch
+*.vsidx
+ternaryLLM_CPU/ternaryLLM/
+ternaryLLM_GPU/ternaryLLM/
+.ipynb_checkpoints/
+torch_gpu/
+
+PyTorch_Extension/.ipynb_checkpoints/*
+PyTorch_Extension/build/*
+PyTorch_Extension/dist/* 
+PyTorch_Extension/ternaryLLM.egg-info/*
+
+# From https://github.com/github/gitignore/blob/main/C%2B%2B.gitignore
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
