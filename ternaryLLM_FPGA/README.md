@@ -1,4 +1,4 @@
-# Accelerator for Ternary Language Models based on FPGA (Bachelor Thesis ETH)
+# An Accelerator for Ternary Language Models based on FPGA
 
 Large Language Models contain billions of parameters, leading to high demands on computation, memory, and energy. These requirements pose significant challenges for edge deployment, where latency, power, and hardware resources are strictly constrained. Ternary quantization addresses these challenges by reducing weights to three discrete values {-1, 0, 1}, which decreases model size and enables efficient sparse matrix multiplication by replacing multiplications with simple additions and subtractions, thereby lowering memory usage and compute cost. Since CPUs and GPUs are not well optimized for arbitrary sparse matrix multiplication, this thesis/repository develops an FPGA-based accelerator for ternary sparse GEMM in LLM inference.
 
