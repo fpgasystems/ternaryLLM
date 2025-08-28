@@ -57,7 +57,7 @@ If you have more than 32 control registers, increase the mask accordingly with m
 
 ## Deployment with Coyote
 
-A pre-built bitstreaam for the U55C-platform is included in `coyote_files/hw/cyt_top.bit` to avoid long building times(Build_HW , Create Folder Structure the hw part can be skipped). However, instrcutions for building a new bitstream are included here as well:
+A pre-built bitstreaam for the U55C-platform is included in `coyote_files/hw/cyt_top.bit` to avoid long building times(**Build_HW , Create Folder Structure the hw part can be skipped**). However, instrcutions for building a new bitstream are included here as well:
 
 ### Book Server 
 Get access to the https://systems.ethz.ch/research/data-processing-on-modern-hardware/hacc.html HACC server and book an alveo-u55c-0X server on https://hacc-booking.inf.ethz.ch/. 
