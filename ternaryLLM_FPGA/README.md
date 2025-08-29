@@ -151,7 +151,7 @@ This initial bitstream can be loaded via JTAG.
 
 ### Build SW
 
-Before compiling the software you need to configure in the software `main.cpp`:
+Before compiling the software, you need to configure the software `main.cpp` located in `Coyote/examples/11_perf_GEMM/sw/src`:
 
 In the `run_test` function, you can enable debug information and output verification by uncommenting the respective code segments.
 
