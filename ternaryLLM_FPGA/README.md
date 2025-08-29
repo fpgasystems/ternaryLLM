@@ -57,7 +57,7 @@ If you have more than 32 control registers, increase the mask accordingly with m
 
 ## Deployment with Coyote
 
-A pre-built bitstreaam for the U55C-platform is included in `coyote_files/hw/cyt_top.bit` to avoid long building times(**Build_HW , Create Folder Structure the hw part can be skipped**). However, instrcutions for building a new bitstream are included here as well:
+A pre-built bitstream for the U55C-platform is included in `coyote_files/hw/cyt_top.bit` to avoid long building times(**Build_HW, Create Folder Structure, the hw part can be skipped**). However, instructions for building a new bitstream are included here as well:
 
 ### Book Server 
 Get access to the https://systems.ethz.ch/research/data-processing-on-modern-hardware/hacc.html HACC server and book an alveo-u55c-0X server on https://hacc-booking.inf.ethz.ch/. 
@@ -107,7 +107,7 @@ Copy `main.cpp` from `sw/gemmacc` into `Coyote/examples/11_perf_GEMM/sw/src`
 
 ### Build HW
 
-Create folder and set configuations using CMakeFile
+Create a folder and set configurations using CMakeFile
 ~~~~
 mkdir examples/11_perf_GEMM/hw/build_hw && cd examples/11_perf_GEMM/hw/build_hw
 cmake ../ -DFDEV_NAME=u55c
@@ -153,11 +153,11 @@ This initial bitstream can be loaded via JTAG.
 
 Before compiling the software you need to configure in the software `main.cpp`:
 
-In `run_test` function you can enable debug informations and output verfication by uncomment the respective code segments.
+In the `run_test` function, you can enable debug information and output verification by uncommenting the respective code segments.
 
-In `main` you either run our evaluation benchmark with `run_benchmark(coyote_thread.get())` or you need to specify matrix-multiplication parameters `seq_len, hidden_size, intermediate_size, sparsity` and run it on the `run_test` function as `run_test(coyote_thread.get(), seq_len, intermediate_size, hidden_size, sparsity)`
+In `main`, you either run our evaluation benchmark with `run_benchmark(coyote_thread.get())` or you need to specify matrix-multiplication parameters `seq_len, hidden_size, intermediate_size, sparsity` and run it on the `run_test` function as `run_test(coyote_thread.get(), seq_len, intermediate_size, hidden_size, sparsity)`
 
-Create folder, set configuations using CMakeFile and compile software files
+Create a folder, set configurations using CMakeFile and compile software files
 ~~~~
 mkdir examples/11_perf_GEMM/sw/build_sw && cd examples/11_perf_GEMM/sw/build_sw
 cmake ../
@@ -220,7 +220,7 @@ than contact the admins of HACC to get into the `vivado-developer` user group.
 
 ### Run
 
-If the driver insertion and bitstream programming went correctly through. The system is read to run the software by simply executing:
+If the driver insertion and bitstream programming went correctly through. The system is ready to run the software by simply executing:
 
 ~~~
 cd Coyote/examples/11_perf_GEMM/sw/build_sw
