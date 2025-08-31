@@ -17,7 +17,6 @@ class PE(conf: ConfigSys) extends Component{
     val reset_acc = in Bool() // to reset the accumulators, driven by DatFSM
     // Output
     val y = out Bits (conf.DATA_WIDTH bits) // Output 512 Bit Y-values
-   // val done_acc = out Bool()
   }
 
   val x_subdivided = io.x.subdivideIn(conf.ENTRIES_PER_BEAT_X slices)

@@ -17,7 +17,7 @@ object MySpinalConfig extends SpinalConfig(
   )
 )
 
-
+// Generates HDL code for Accelerator
 object TernaryGEMM {
   def main(args: Array[String]): Unit = {
     val sysConf = new ConfigSys {}
@@ -29,6 +29,7 @@ object TernaryGEMM {
   }
 }
 
+// Generates HDL code for PE logic
 object PE {
   def main(args: Array[String]): Unit = {
     val sysConf = new ConfigSys {}
@@ -41,7 +42,7 @@ object PE {
 }
 
 
-
+// Generates HDL code for test logic
 object TestLogic {
   def main(args: Array[String]): Unit = {
     val sysConf = new ConfigSys {}

@@ -10,7 +10,7 @@ import scala.util.Random
 object InputAndCheck {
 
 
-
+  // Generate activation X
   def generateX(M: Int, K: Int) : Array[Byte] = {
     val buffer_X = ByteBuffer.allocate(M * K) // 2 Bytes per short
     buffer_X .order(ByteOrder.LITTLE_ENDIAN)
@@ -37,11 +37,11 @@ object InputAndCheck {
 
     val S_2 = S / 2
     val Y = Array.ofDim[Int](M, N)
-    val entries_per_K_slice = (entries / (K / 256))
+    val entries_per_K_slice = (entries / (K / 128))
 
     // Convert X (Byte[]) to 2D Short array (M x K)
     val X_buffer = ByteBuffer.wrap(X).order(ByteOrder.LITTLE_ENDIAN)
-    val X_matrix = Array.ofDim[Short](M, K)
+    val X_matrix = Array.ofDim[Byte](M, K)
     for (m <- 0 until M; k <- 0 until K) {
       X_matrix(m)(k) = X_buffer.get(m * K + k)
     }
@@ -49,15 +49,14 @@ object InputAndCheck {
     // Convert W (Byte[]) to 2D Short array (times_entries x N)
     val times = N / (S_2)
     val times_entries = times * entries
-    val W_buffer = ByteBuffer.wrap(W).order(ByteOrder.LITTLE_ENDIAN) // NEED TO BE CHANGED TO as.ShortBuffer
-    val W_matrix = Array.ofDim[Short](times_entries, S)
+    val W_buffer = ByteBuffer.wrap(W).order(ByteOrder.LITTLE_ENDIAN)
+    val W_matrix = Array.ofDim[Byte](times_entries, S)
     for (k <- 0 until times_entries ; n <- 0 until S) {
       W_matrix(k)(n) = W_buffer.get(k * S + n)
     }
 
     var slice_weights = 0
 
-    // Y = M X N = index_0 index_1
     for (m <- 0 until M) {
       slice_weights = 0
       for (n <- 0 until N) {

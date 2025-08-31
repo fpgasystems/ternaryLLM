@@ -408,9 +408,9 @@ void run_test(cThread<std::any> *coyote_thread, int M, int N, int K, double spar
     
     std:cout << "Reset Hardware" << std::endl;
 
+    // Debug:
     // std::cout << "Get START = " << coyote_thread->getCSR(static_cast<uint32_t>(START)) << std::endl;
     // std::cout << "Get DONE = " << coyote_thread->getCSR(static_cast<uint32_t>(DONE)) << std::endl;
-
     // std::cout << "Done Signal is high" << std::endl;
 
     // LOCAL_SYNC
@@ -424,7 +424,7 @@ void run_test(cThread<std::any> *coyote_thread, int M, int N, int K, double spar
     // int16_t *Y_Naive = naiveGEMM(M, N, S_SLICE, K, entries, X, W, entries_Kslice);
     // std::cout << std::dec;
 
-   //assertOutput(Y_Naive, Y, M * N);
+    //assertOutput(Y_Naive, Y, M * N);
 
     // // Output Naive Y :
     // std::cout << "Output Naive Y" << std::endl;
@@ -460,6 +460,8 @@ void run_test(cThread<std::any> *coyote_thread, int M, int N, int K, double spar
 // Evaluation benchmark: Up and Down Projection
 void run_benchmark(cThread<std::any> *coyote_thread){
 
+    std::cout << "Start benchmark" << std::endl;
+
      // Define parameters
     const int seq_lens[] = {4, 16, 64,128,256};
     const double sparsities[] = {0.5, 0.75, 0.875, 0.9375};
@@ -467,48 +469,58 @@ void run_benchmark(cThread<std::any> *coyote_thread){
     // ---------------------
     // Up-projection
     // ---------------------
-    std::cout << "Running Up-projection benchmarks with sparsity=0.5" << std::endl;
+    std::cout << "Start Up-projection benchmark" << std::endl;
     const int up_K[] = {2048, 3072, 4096};
     const int up_N[] = {8192, 8192, 14336};
     const double fixed_sparsity = 0.5;
 
     // LLaMA-3-1B with different sparsity
+      std::cout << "Up-projection with different sparsity" << std::endl;
       for (double s : sparsities) {
           run_test(coyote_thread, 128, up_N[0], up_K[0], s);
       }
 
     //LLaMA-3-1B with fixed sparsity and changing seq_lens
+     std::cout << "Up-projection with increasing seq_len" << std::endl;
      for(int i = 0 ; i < 5; ++i){
          run_test(coyote_thread, seq_lens[i],up_N[0], up_K[0], fixed_sparsity);
      }
 
     // Changing Model sizes with fixed sparsity and fixed seq_len
+      std::cout << "Up-projection with different model sizes" << std::endl;
       for(int i = 0 ; i < 3; ++i){
          run_test(coyote_thread, 64 ,up_N[i], up_K[i], fixed_sparsity);
      }
 
+     std::cout << "End Up-projection benchmark" << std::endl;
+
     // // ---------------------
     // // Down-projection
     // // ---------------------
-    std::cout << "Running Down-projection benchmarks sparsity=0.5 " << std::endl;
+    std::cout << "Start Down-projection benchmark" << std::endl;
     const int down_K[] = {8192, 8192, 14336};
     const int down_N[] = {2048, 3072, 4096};
 
     // LLaMA-3-1B with different sparsity
+    std::cout << "Down-projection with different sparsity" << std::endl;
     for (double s : sparsities) {
          run_test(coyote_thread, 128, down_N[0], down_K[0], s);
      }
 
      // LLaMA-3-1B with different seq_len and fixed sparsity
+     std::cout << "Down-projection with increasing seq_len" << std::endl;
       for(int i = 0 ; i < 5; ++i){
          run_test(coyote_thread, seq_lens[i],down_N[0], down_K[0], fixed_sparsity);
      }
 
       // Changing Model sizes with fixed sparsity and fixed seq_len
+      std::cout << "Down-projection with different model sizes" << std::endl;
     for (int i = 0; i < 3; ++i) {
          run_test(coyote_thread, 64, down_N[i], down_K[i], fixed_sparsity);
      }
+     std::cout << "End Down-projection benchmark" << std::endl;
 
+     std::cout << "End benchmark" << std::endl;
 }
 
 int main(int argc, char *argv[])
@@ -522,7 +534,7 @@ int main(int argc, char *argv[])
     std::unique_ptr<cThread<std::any>> coyote_thread(new cThread<std::any>(DEFAULT_VFPGA_ID, getpid(), 0));
     std::cout << "Coyote Thread created" << std::endl;
 
-    //run_benchmark(coyote_thread.get());
+     run_benchmark(coyote_thread.get());
     //run_test(coyote_thread.get(), seq_len, intermediate_size, hidden_size, sparsity);
 
     return EXIT_SUCCESS;

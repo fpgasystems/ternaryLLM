@@ -28,8 +28,6 @@ trait ConfigSys {
   val STRM_CARD = 0
   val STRM_HOST = 1
 
-  // Assumption: X,Y :  16bit floating point , 8bit floating point FP8
-  //             index: 8 bit UInt
   val BIT_WIDTH_X_Y = 16
   val BIT_WIDTH_INDEX = 8
   val BIT_WIDTH_INPUT  = 16
@@ -80,14 +78,12 @@ trait ConfigSys {
   val Row_Data_X = K_slice * DATA_SIZE_X_Y_BYTE // in Byte
   val Row_Data_Y = S / 2 * DATA_SIZE_X_Y_BYTE // as we write S/2 values back in memory (Byte)
   val Row_Data_W = S * DATA_SIZE_W_BYTE // in Byte
+  val OFFSET_X = log2Up(UNROLL_M * DATA_SIZE_X_Y_BYTE)
 
   // Need to compute number of beats on runtime
   val total_numb_beat_X = if ((Row_Data_X % BYTES_PER_BEAT == 0)) Row_Data_X / BYTES_PER_BEAT else Row_Data_X / BYTES_PER_BEAT + 1 // Total Number of Beats to read 1 K_slice of X
   val total_numb_beat_Y = if ((Row_Data_Y % BYTES_PER_BEAT == 0)) Row_Data_Y / BYTES_PER_BEAT else Row_Data_Y / BYTES_PER_BEAT + 1 // Total Number of Beats for writing S/2 values of this Row
   val total_numb_beat_W = if ((Row_Data_W % BYTES_PER_BEAT == 0)) Row_Data_W / BYTES_PER_BEAT else Row_Data_W / BYTES_PER_BEAT + 1 // Total Number of Beats for reading S values of
-
-  val OFFSET_X = log2Up(UNROLL_M * DATA_SIZE_X_Y_BYTE)
-
 }
 
 class Config {

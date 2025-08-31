@@ -8,7 +8,7 @@ import spinal.lib.{Counter, Shift, master, slave}
 
 import scala.language.postfixOps
 
-class DataFSM(conf: ConfigSys) extends Component{
+class DataFSM(conf: ConfigSys) extends Component {
 
   val io = new Bundle {
     // Coyote V2 Interface
@@ -19,7 +19,7 @@ class DataFSM(conf: ConfigSys) extends Component{
 
     val axis_card_recv = slave(AXI4SR())
     val x = out Bits (conf.DATA_WIDTH bits) // Input 512-Bit X-values from RAM driven by DataFSM
-    val w = master Stream Bits (conf.DATA_WIDTH bits) // Input Stream 512-Bit W-values driven by DataFSM
+    val w = master Stream Bits(conf.DATA_WIDTH bits) // Input Stream 512-Bit W-values driven by DataFSM
 
     // Runtime Inputs
     val M = in UInt (16 bits)
@@ -29,29 +29,28 @@ class DataFSM(conf: ConfigSys) extends Component{
     val base_addr_W = in UInt (conf.VADDR_BITS bits)
     val base_addr_Y = in UInt (conf.VADDR_BITS bits)
     val Non_zero_per_K_slice = in UInt (16 bits)
-    val expected_beats_X = in UInt(16 bits)
+    val expected_beats_X = in UInt (16 bits)
 
     // Logic in and output
     val select_Y = out UInt (conf.SHIFT_UNROLL bits) // UNROLL_M selectors needed
-    val enable_X = out Vec(Bits(2 bits),conf.UNROLL_M)
+    val enable_X = out Vec(Bits(2 bits), conf.UNROLL_M)
     val reset_acc = out Bool()
-   // val done_acc = in Bool()
-    val cnt_cycles = out Bits(40 bits)
+    val cnt_cycles = out Bits (40 bits)
     val enable_Y_write = out Bool()
     //Debug
-//    val cnt_N = out UInt(16 bits)
-//    val cnt_M = out UInt(16 bits)
-//    val cnt_K = out UInt(16 bits)
-//    val cnt_entries = out UInt(16 bits)
-//    val cnt_beats_W = out UInt (16 bits) // tracks all beats for whole W
-//    val cnt_unroll_Y = out UInt (log2Up(conf.UNROLL_M) bits)
-//    val cnt_unroll_x = out UInt(16 bits)
-//    val k_c = out UInt (16 bit)
-//    val cnt_s = out UInt (log2Up(conf.TOTAL_BEATS_KSLICE)bits)
-//    val cnt_row = out UInt (log2Up(conf.UNROLL_M) bits)
-//    val cnt_N_write = out UInt(16 bits)
-//    val waitCounter = out UInt (3 bits)
-//    val dataFSM_state = out Bits(4 bits)
+    //    val cnt_N = out UInt(16 bits)
+    //    val cnt_M = out UInt(16 bits)
+    //    val cnt_K = out UInt(16 bits)
+    //    val cnt_entries = out UInt(16 bits)
+    //    val cnt_beats_W = out UInt (16 bits) // tracks all beats for whole W
+    //    val cnt_unroll_Y = out UInt (log2Up(conf.UNROLL_M) bits)
+    //    val cnt_unroll_x = out UInt(16 bits)
+    //    val k_c = out UInt (16 bit)
+    //    val cnt_s = out UInt (log2Up(conf.TOTAL_BEATS_KSLICE)bits)
+    //    val cnt_row = out UInt (log2Up(conf.UNROLL_M) bits)
+    //    val cnt_N_write = out UInt(16 bits)
+    //    val waitCounter = out UInt (3 bits)
+    //    val dataFSM_state = out Bits(4 bits)
     val start = in Bool()
     val done = out Bool()
 
@@ -90,8 +89,6 @@ class DataFSM(conf: ConfigSys) extends Component{
   // Set enable_write to false as default
   enable_write := False
 
-  // Default io.x
-  // io.x := 0
   // Creates a RAM of Size conf.BUFFERSIZE depending on Model
   val Buffer_X = Mem(Bits(conf.axiConfig.dataWidth bits), conf.BUFFERSIZE)
 
@@ -103,7 +100,7 @@ class DataFSM(conf: ConfigSys) extends Component{
   )
 
   // Read Port, 512-bits
-   io.x := Buffer_X.readAsync(addr_r)
+  io.x := Buffer_X.readAsync(addr_r)
 
   // Intialize Counter
   val cnt_N = Reg(UInt(16 bits))
@@ -123,11 +120,11 @@ class DataFSM(conf: ConfigSys) extends Component{
   val cnt_read_4K = Counter(16 bits)
 
   // Logic for 4K reading:
-  val X_4rows_base = (cnt_unroll_x.value << conf.SHIFT_UNROLL) * io.K    // for 4 Rows index
-  val X_1row_base = cnt_row.value * io.K                                // for 1 Row index
-  val X_4k_1row_base = (X_4rows_base + X_1row_base ) << conf.BYTE_X     // for row and 4k Base
-  val X_4k_base = cnt_read_4K << conf.SHIFT_4K // this is not in byte so it says how many entries of K
-  val x_load_addr = io.base_addr_X  + X_4k_1row_base +  X_4k_base
+  val X_4rows_base = (cnt_unroll_x.value << conf.SHIFT_UNROLL) * io.K
+  val X_1row_base = cnt_row.value * io.K // for 1 Row index
+  val X_4k_1row_base = (X_4rows_base + X_1row_base) << conf.BYTE_X
+  val X_4k_base = cnt_read_4K << conf.SHIFT_4K
+  val x_load_addr = io.base_addr_X + X_4k_1row_base + X_4k_base
 
   // Calculations for Writing
   val base_unroll_Y_base = (cnt_unroll_x.value << conf.SHIFT_UNROLL) + cnt_unroll_Y.value
@@ -136,10 +133,10 @@ class DataFSM(conf: ConfigSys) extends Component{
 
   // Calculations for 4K reading and remainder logic
   val K_in_Bytes = io.K << conf.BYTE_X
-  val total_4K_slice = K_in_Bytes >> log2Up(4096)// for 1 Row how many times reading 4K
+  val total_4K_slice = K_in_Bytes >> log2Up(4096) // Number of 4K reads per row"
   val remainder_length = K_in_Bytes(11 downto 0)
   val got_all_4k = cnt_read_4K === total_4K_slice
-  when(remainder_length === 0){
+  when(remainder_length === 0) {
     got_remainder_read := True
   }
 
@@ -154,18 +151,18 @@ class DataFSM(conf: ConfigSys) extends Component{
   val beats_4K = Reg(UInt(16 bits))
 
 
-//  // DEBUG
-//  io.cnt_N := cnt_N
-//  io.cnt_M := cnt_M
-//  io.cnt_K := cnt_K
-//  io.cnt_entries := cnt_entries.value
-//  io.cnt_beats_W := cnt_beats_W.value
-//  io.cnt_unroll_Y := cnt_unroll_Y.value
-//  io.cnt_unroll_x := cnt_unroll_x.value
-//  io.k_c := k_c.value
-//  io.cnt_s := cnt_s.value
-//  io.cnt_row := cnt_row.value
-//  io.cnt_N_write := cnt_N_write
+  //  // DEBUG
+  //  io.cnt_N := cnt_N
+  //  io.cnt_M := cnt_M
+  //  io.cnt_K := cnt_K
+  //  io.cnt_entries := cnt_entries.value
+  //  io.cnt_beats_W := cnt_beats_W.value
+  //  io.cnt_unroll_Y := cnt_unroll_Y.value
+  //  io.cnt_unroll_x := cnt_unroll_x.value
+  //  io.k_c := k_c.value
+  //  io.cnt_s := cnt_s.value
+  //  io.cnt_row := cnt_row.value
+  //  io.cnt_N_write := cnt_N_write
 
 
   // Default io.enable_Y_write
@@ -180,16 +177,15 @@ class DataFSM(conf: ConfigSys) extends Component{
   io.reset_acc := False
 
 
-
   // FSM
   val dataFSM = new StateMachine {
     val IDLE = new State with EntryPoint
     val NEXT_4ROWS, LOAD_X_4K, LOAD_X_DATA, LOAD_SLICE, READ_W_AR, LOAD_W_DATA, WAIT, MEM_ADDR_Y, MEM_WRITE_Y, SET_ADDR, WAIT_ACC = new State
 
+    val waitCounter = Counter(3 bits) // Counter for waiting cyles
+
     // IDLE: Wait for start signal
     IDLE.whenIsActive {
-      // Reset done signal
-
       // Set values for reading/writing of Buffer in IDLE State
       enable_write := False
       addr_r := 0
@@ -257,143 +253,141 @@ class DataFSM(conf: ConfigSys) extends Component{
 
       io.sq_rd.payload.vaddr := x_load_addr.resized
       // 4k length
-      io.sq_rd.payload.len :=  conf.four_K
+      io.sq_rd.payload.len := conf.four_K
       beats_4K := conf.EXPECTED_BEATS_4K
 
-      when(got_all_4k){
+      when(got_all_4k) {
         // remainder
-        io.sq_rd.payload.len :=  remainder_length.resized
+        io.sq_rd.payload.len := remainder_length.resized
         beats_4K := ((remainder_length >> conf.AXI_DATA_SIZE) - 1).resized
-      io.sq_rd.payload.last := True
-      io.sq_rd.valid := True
+        io.sq_rd.payload.last := True
+        io.sq_rd.valid := True
 
-      when(io.sq_rd.fire) {
-        when(!got_all_4k){
-          cnt_read_4K.increment()
-        } otherwise {
-          got_remainder_read.set()
+        when(io.sq_rd.fire) {
+          when(!got_all_4k) {
+            cnt_read_4K.increment()
+          } otherwise {
+            got_remainder_read.set()
+          }
+          goto(LOAD_X_DATA)
         }
-        goto(LOAD_X_DATA)
+
+
       }
 
 
+      // LOAD_X_DATA: read one row activations and store it into BRAM, we need to stay here until we have put all data into buffer
+      LOAD_X_DATA.whenIsActive {
 
-    }
+        // complete Queue is ready and we are ready to receive data on the axis_card_recv
+        io.cq_rd.ready := True
+        io.axis_card_recv.tready := True
 
+        addr_w := ((cnt_row.value << conf.SHIFT_BUFFERSIZE_PER_ROW) + k_c.value).resized
 
-    // LOAD_X_DATA: read one row activations and store it into BRAM, we need to stay here until we have put all data into buffer
-    LOAD_X_DATA.whenIsActive {
+        when(io.axis_card_recv.tvalid && io.axis_card_recv.tready) { // We receive 512bits through the Bus
 
-      // complete Queue is ready and we are ready to receive data on the axis_card_recv
-      io.cq_rd.ready := True
-      io.axis_card_recv.tready := True
+          enable_write := True
 
-      addr_w := ((cnt_row.value << conf.SHIFT_BUFFERSIZE_PER_ROW) + k_c.value).resized
-
-      when(io.axis_card_recv.tvalid && io.axis_card_recv.tready) { // We receive 512bits through the Bus
-
-        enable_write := True
-
-        k_c.increment
-        cnt_beats_x.increment()
-        cnt_beats_slice.increment()
+          k_c.increment
+          cnt_beats_x.increment()
+          cnt_beats_slice.increment()
 
 
-        // Check if this is the last beat
-        when(cnt_beats_x >= io.expected_beats_X) {
-          cnt_row.clear()
-          k_c.clear()
-          cnt_K := 0
-          cnt_s.clear()
-          cnt_read_4K.clear()
-          got_remainder_read := False
-          cnt_beats_slice.clear()
-          goto(SET_ADDR)
-        } elsewhen(cnt_beats_slice >= beats_4K){
-          // if one_row has been read
-          cnt_beats_slice.clear()
-          when(got_all_4k && got_remainder_read) {
-            cnt_row.increment()
+          // Check if this is the last beat
+          when(cnt_beats_x >= io.expected_beats_X) {
+            cnt_row.clear()
             k_c.clear()
+            cnt_K := 0
+            cnt_s.clear()
             cnt_read_4K.clear()
             got_remainder_read := False
+            cnt_beats_slice.clear()
+            goto(SET_ADDR)
+          } elsewhen (cnt_beats_slice >= beats_4K) {
+            // if one_row has been read
+            cnt_beats_slice.clear()
+            when(got_all_4k && got_remainder_read) {
+              cnt_row.increment()
+              k_c.clear()
+              cnt_read_4K.clear()
+              got_remainder_read := False
+            }
+            goto(LOAD_X_4K)
+
           }
-          goto(LOAD_X_4K)
+
 
         }
 
+      }
+      // NEED THIS SO WE HAVE NOT A DELAY OF 1 CYCLE FOR READING BUFFER_OUT
+      SET_ADDR.whenIsActive {
+        addr_r := (base_row_mem + base_Kslice_mem + cnt_s.value).resized
+        goto(LOAD_SLICE)
+      }
+
+
+      LOAD_SLICE.whenIsActive {
+
+        // set the enable_X signal(ONE_HOT encoding)
+        switch(cnt_s.value) {
+          is(0) {
+            io.enable_X(cnt_row.value.resized) := B"01"
+          }
+          is(1) {
+            io.enable_X(cnt_row.value.resized) := B"10"
+          }
+        }
+
+        when(cnt_s.value >= conf.TOTAL_BEATS_KSLICE_0 && cnt_row.value >= conf.UNROLL_M_0_INDEX) {
+          cnt_s.clear()
+          cnt_row.clear()
+          cnt_K := cnt_K + conf.K_slice // we have put first K_Sclices into PE
+          goto(READ_W_AR)
+        } elsewhen (cnt_s.value >= conf.TOTAL_BEATS_KSLICE_0) { // then we put 1 K_SLICE into PE
+          cnt_s.clear()
+          cnt_row.increment()
+          goto(SET_ADDR)
+        } otherwise {
+          cnt_s.increment()
+          goto(SET_ADDR)
+        }
 
       }
 
-    }
+      // READ_W_AR: Set configuration for fetching weights.
+      READ_W_AR.whenIsActive {
 
-    // RAM is written with all the data
-    // NEED THIS SO WE HAVE NOT A DELAY OF 1 CYCLE FOR READING BUFFER_OUT
-    SET_ADDR.whenIsActive {
-      addr_r := (base_row_mem + base_Kslice_mem + cnt_s.value).resized
-      goto(LOAD_SLICE)
-    }
+        io.sq_rd.payload.vaddr := (io.base_addr_W + (cnt_beats_W.value << conf.OFFSET)).resized
+        io.sq_rd.payload.len := conf.Row_Data_W
+        io.sq_rd.payload.last := True
+        io.sq_rd.valid := True
 
-
-    LOAD_SLICE.whenIsActive {
-
-      // READ until we have read 1 K_slice of one row and then go to the next row
-
-      // set the enable_X signal(ONE_HOT encoding)
-      switch(cnt_s.value){
-        is(0) { io.enable_X(cnt_row.value.resized) := B"01" }
-        is(1) { io.enable_X(cnt_row.value.resized) := B"10" }
-      }
-
-      when(cnt_s.value >= conf.TOTAL_BEATS_KSLICE_0 && cnt_row.value >=  conf.UNROLL_M_0_INDEX) {
-        cnt_s.clear()
-        cnt_row.clear()
-        cnt_K := cnt_K + conf.K_slice  // we have put first K_SCLICES into PE
-        goto(READ_W_AR)
-      } elsewhen (cnt_s.value >= conf.TOTAL_BEATS_KSLICE_0) { // then we put 1 K_SLICE into PE
-        cnt_s.clear()
-        cnt_row.increment()
-        goto(SET_ADDR)
-      } otherwise {
-        cnt_s.increment()
-        goto(SET_ADDR)
-      }
-
-    }
-
-    //Format : MERGED TCS Grouped (Uniformal)
-    // READ_W_AR: set configuation fetching weights
-    READ_W_AR.whenIsActive {
-
-      io.sq_rd.payload.vaddr := (io.base_addr_W + (cnt_beats_W.value << conf.OFFSET)).resized
-      io.sq_rd.payload.len := conf.Row_Data_W  // 64 Bytes = 64 Weights of 32 Columns
-      io.sq_rd.payload.last := True
-      io.sq_rd.valid := True
-
-      when(io.sq_rd.fire) {
-        goto(LOAD_W_DATA)
-      }
-
-    }
-
-    // LOAD_W_DATA: read S indices and put into buffer , stay until we have put all data into the buffers
-    LOAD_W_DATA.whenIsActive {
-
-      io.cq_rd.ready := True
-      io.axis_card_recv.tready := io.w.ready  // wait until ALL PE are ready to receive Weights
-
-      when(io.axis_card_recv.tvalid && io.axis_card_recv.tready) { // arrives 512 bit
-
-        io.w.valid := True
-
-        cnt_beats_W.increment() // for address calculation
-        goto(WAIT_ACC)
+        when(io.sq_rd.fire) {
+          goto(LOAD_W_DATA)
+        }
 
       }
 
-    }
+      // LOAD_W_DATA: read S indices and put into io.w
+      LOAD_W_DATA.whenIsActive {
 
-    WAIT_ACC.whenIsActive{
+        io.cq_rd.ready := True
+        io.axis_card_recv.tready := io.w.ready
+
+        when(io.axis_card_recv.tvalid && io.axis_card_recv.tready) { // arrives 512 bit
+
+          io.w.valid := True
+
+          cnt_beats_W.increment() // for address calculation
+          goto(WAIT_ACC)
+
+        }
+
+      }
+
+      WAIT_ACC.whenIsActive {
         when(cnt_entries.value < io.Non_zero_per_K_slice - 1) { // read Non_zero_per_K_slice times S indexes for S/2 columns
           cnt_entries.increment()
           goto(READ_W_AR)
@@ -413,76 +407,74 @@ class DataFSM(conf: ConfigSys) extends Component{
 
         }
 
-    }
-
-    val waitCounter = Counter(3 bits) // Counter for waiting cyles
-    WAIT.whenIsActive {
-      when(waitCounter.value === 7) {
-        waitCounter.clear()
-        goto(MEM_ADDR_Y)
-      }.otherwise {
-        waitCounter.increment()
-      }
-    }
-
-    // MEM_ADDR_Y :  Configure AXI write-queue
-    MEM_ADDR_Y.whenIsActive {
-
-      io.sq_wr.payload.vaddr := (io.base_addr_Y + base_Y_row + base_Y_column).resized
-      io.sq_wr.payload.len := conf.Row_Data_Y
-      io.sq_wr.payload.last := True
-      io.sq_wr.valid := True
-
-      when(io.sq_wr.fire) {
-        goto(MEM_WRITE_Y)
       }
 
+      WAIT.whenIsActive {
+        when(waitCounter.value === 7) {
+          waitCounter.clear()
+          goto(MEM_ADDR_Y)
+        }.otherwise {
+          waitCounter.increment()
+        }
+      }
 
-    }
-    // MEM_WRITE: put data into io.w
-    MEM_WRITE_Y.whenIsActive {
+      // MEM_ADDR_Y : Configure AXI write-queue
+      MEM_ADDR_Y.whenIsActive {
 
-      io.cq_wr.ready := True
+        io.sq_wr.payload.vaddr := (io.base_addr_Y + base_Y_row + base_Y_column).resized
+        io.sq_wr.payload.len := conf.Row_Data_Y
+        io.sq_wr.payload.last := True
+        io.sq_wr.valid := True
 
-      io.enable_Y_write := True
-      io.select_Y := cnt_unroll_Y.value
+        when(io.sq_wr.fire) {
+          goto(MEM_WRITE_Y)
+        }
 
-      when(io.cq_wr.fire) { // received feedback
+
+      }
+      // MEM_WRITE: Sets the payload and waits until the write transaction completes.
+      MEM_WRITE_Y.whenIsActive {
+
+        io.cq_wr.ready := True
+
+        io.enable_Y_write := True
+        io.select_Y := cnt_unroll_Y.value
+
+        when(io.cq_wr.fire) { // received feedback
 
 
-        when(cnt_unroll_Y >= conf.UNROLL_M_0_INDEX){
+          when(cnt_unroll_Y >= conf.UNROLL_M_0_INDEX) {
 
-          // we have stored 4 times S/2 columns
-          cnt_unroll_Y.clear()
-          k_c.clear()
+            // we have stored Unroll_M times S/2 columns
+            cnt_unroll_Y.clear()
+            k_c.clear()
 
-          when(cnt_N < io.N) { // if we have some weight columns left
-            cnt_N_write := cnt_N_write + conf.S_2
-            io.reset_acc := True // reset accumulators
-            goto(SET_ADDR) // if we have columns of W left
+            when(cnt_N < io.N) { // if we have some weight columns left
+              cnt_N_write := cnt_N_write + conf.S_2
+              io.reset_acc := True // reset accumulators
+              goto(SET_ADDR)
+            }.otherwise {
+              cnt_N_write := 0
+              cnt_M := cnt_M + conf.UNROLL_M
+              goto(NEXT_4ROWS)
+            }
+
           }.otherwise {
-            cnt_N_write := 0
-            cnt_M := cnt_M + conf.UNROLL_M
-            goto(NEXT_4ROWS)
+            cnt_unroll_Y.increment()
+            goto(MEM_ADDR_Y)
           }
 
-        }.otherwise{
-          cnt_unroll_Y.increment()
-          goto(MEM_ADDR_Y)
         }
 
       }
 
     }
 
+    // Debug
+    //  dataFSM.postBuild{
+    //    io.dataFSM_state := dataFSM.stateReg.asBits
+    //  }
+
+
   }
-
-// Debug
-//  dataFSM.postBuild{
-//    io.dataFSM_state := dataFSM.stateReg.asBits
-//  }
-
-
-
-
 }
