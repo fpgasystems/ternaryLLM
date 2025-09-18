@@ -25,6 +25,10 @@ Include PyTorch and Eigen library for correct compiling
 
 Include PyTorch .lib and .dll for correct linking
 - libtorch\lib OR miniconda3\Lib\site-packages\torch\lib
+- Copy torch.dll and other .dll from libtorch\lib to the .exe folder: x64/release and x64/debug
 
-
-
+Setup flags
+- Compiler: /Ox /Ot /Oi /AVX2 (/AVX-512) /openmp /fp:fast /GL
+- Linker: /LTCG /OPT:REF /OPT:ICF
+- Additional compiler flags: /openmp:experimental 
+- C/C++ Preprocessor: _CRT_SECURE_NO_WARNINGS (otherwise Eigen and PyTorch won't compile)
