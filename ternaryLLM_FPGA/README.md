@@ -117,6 +117,7 @@ Create projects
 ~~~~
 make project 
 ~~~~
+Comment out the ddr_xbar in [scripts/ip_inst/memory_infrastructure.tcl](https://github.com/fpgasystems/Coyote/blob/master/scripts/ip_inst/memory_infrastructure.tcl) if this error happens. ERROR: [IP_Flow 19-3478] Validation failed for parameter 'My S00_THREAD_ID_WIDTH(S00_THREAD_ID_WIDTH)' with current value '1' for IP 'ddr_xbar'. S0_THREAD_ID_WIDTH must be less than or equal to 0
 
 After generating the project, copy the binary file  `hw/gen/ternaryGEMMOP.v_toplevel_TopLevel_dataFSM_1_Buffer_X.bin`  into  `Coyote/examples/11_perf_GEMM/hw/build_hw/perf_GEMM_config_0/user_c0_0/hdl/ext/raw`  
 
